@@ -1,0 +1,12 @@
+{
+  "name": "revana",
+  "description": "Revana: cheap AI image and video generation for Claude",
+  "owner": { "name": "Revana", "email": "hello@revana.si" },
+  "plugins": [
+    {
+      "name": "revana",
+      "source": "./",
+      "description": "Generate AI images, videos and music from Claude through one API key: 120+ models, cheapest route first, failed generations free."
+    }
+  ]
+}

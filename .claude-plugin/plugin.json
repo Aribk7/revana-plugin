@@ -1,0 +1,28 @@
+{
+  "name": "revana",
+  "displayName": "Revana",
+  "version": "1.0.0",
+  "description": "Generate AI images, videos and music cheaply from Claude: 120+ models (Seedance, Veo, Kling, Wan, GPT Image, Nano Banana and more) through one API key, with automatic fallback and failed generations free.",
+  "author": {
+    "name": "Revana",
+    "email": "hello@revana.si",
+    "url": "https://revana.si"
+  },
+  "homepage": "https://revana.si",
+  "repository": "https://github.com/Aribk7/revana-plugin",
+  "license": "MIT",
+  "keywords": [
+    "ai video",
+    "image generation",
+    "video generation",
+    "seedance",
+    "veo",
+    "kling",
+    "gpt image",
+    "nano banana",
+    "text to video",
+    "api"
+  ],
+  "privacyPolicyUrl": "https://revana.si/privacy",
+  "icon": "./.claude-plugin/icon.png"
+}

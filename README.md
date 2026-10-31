@@ -10,14 +10,14 @@ starts on the cheapest provider and falls back automatically; failed generations
 claude plugin install revana --marketplace Aribk7/revana-plugin
 ```
 
-Then create an API key at https://revana.si/dashboard and `export REVANA_API_KEY=sr_live_...`. The bundled MCP
-server signs in with OAuth the first time you use it (`/mcp`, choose revana).
+The bundled MCP server signs in to your Revana account with OAuth the first time you use it (`/mcp`, choose
+revana). No API key is needed.
 
 ## What it adds
 
 - **MCP server** `https://revana.si/api/mcp`: list models and prices, free quotes, Seedance 2.5 video and
   Nemesis clip restaging, download links. Works in Claude, ChatGPT, Cursor and Codex too: https://revana.si/mcp
-- **Skill** `revana`: Claude calls the REST API for any of the 120+ models, quotes the price, and asks before
-  spending.
+- **Skill** `revana`: Claude prices a video with a free quote, asks before spending, makes it with Seedance 2.5 and
+  returns the download link. For the other 200+ models over REST, see https://revana.si/docs.
 
 Prices: https://revana.si/pricing. API reference: https://revana.si/docs.

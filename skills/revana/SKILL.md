@@ -1,65 +1,45 @@
 ---
 name: revana
-description: Generate AI images, videos and music through the Revana API (revana.si) - Seedance, Veo, Kling, Wan, Hailuo, Sora, GPT Image, Nano Banana, Flux, Midjourney, Suno and 100+ more on one API key, at low prices. Use when the user asks to make, render or generate a picture, image, photo, video, clip, animation or song with an AI model, wants the cheapest API for image or video generation, or names one of these models.
+description: Make AI videos with Seedance 2.5 and restage clips with Nemesis through the Revana MCP server (revana.si), with a free price quote before anything is spent. Use when the user asks to make, render or generate a video, clip or animation with AI, wants the cheapest Seedance API, or asks what Revana's models cost.
 ---
 
-# Revana: images, videos and music from one API
+# Revana: AI video from Claude
 
-Revana (https://revana.si) runs 120+ image, video and music models behind one request shape. Each job starts on
-the cheapest provider and falls back automatically; only the route that succeeds is charged, and a failed
-generation costs nothing. Prices are prepaid credits, 100 credits = $1.
+Revana (https://revana.si) runs image, video and music models behind one account. Each job starts on the cheapest
+provider and falls back automatically; only a generation that succeeds is charged, and a failed one costs nothing.
+Credits are prepaid, 100 credits = $1.
 
-## Before you start
+This plugin works through the bundled **revana MCP server** (`https://revana.si/api/mcp`). The first time a Revana
+tool is used, the user signs in to Revana with OAuth (in Claude Code: `/mcp`, then choose revana). Never ask the
+user to paste an API key into the chat.
 
-- The key is in `REVANA_API_KEY` (starts `sr_live_`). If it is not set, ask the person to create one at
-  https://revana.si/dashboard and export it. Never print the key or write it into a file.
-- Two ways to work:
-  - The bundled **revana MCP server** (tools `list_models`, `get_quote`, `generate_video`, `get_video`,
-    `get_video_link`, `quote_nemesis`, `make_nemesis`, `upload_file`, `get_balance`). It covers Seedance 2.5
-    video and Nemesis restaging, and signs in with OAuth the first time (`/mcp` in Claude Code).
-  - The **REST API** below, for every model including images and music.
+## Tools
 
-## Pick a model and price it
+| Tool | Use it to |
+|---|---|
+| `list_models` | List models with their options and live prices |
+| `get_balance` | See how many credits the account can spend |
+| `get_quote` | Price a Seedance 2.5 video before making it (free) |
+| `generate_video` | Make the video (spends credits) |
+| `get_video` / `get_video_link` | Check progress and get a download link |
+| `upload_file` | Upload a reference image or clip the user provides |
+| `quote_nemesis` / `make_nemesis` | Price and run a Nemesis restage of an existing clip |
 
-```bash
-curl -s https://api.revana.si/v1/models | jq '.data[] | {id, kind, price}'   # no key needed
-```
+## How to work
 
-Every model's options and prices are also in https://revana.si/data/models.json, and each has a page at
-`https://revana.si/models/<id>` and markdown at `https://revana.si/models/<id>.md`. Prices are
-`per_image`, `per_second` (of video out) or `per_job`, keyed by resolution and `+audio` where it applies.
+1. Pick settings with the user: prompt, resolution (480p, 720p or 1080p), duration in seconds, aspect ratio,
+   and whether to add audio. If they give a start frame or reference, upload it with `upload_file` first.
+2. Call `get_quote`, then **tell the user the exact price and wait for a clear yes** before calling
+   `generate_video` or `make_nemesis`. Check `get_balance` if the quote may exceed what is left.
+3. After `generate_video`, poll `get_video` every 10-20 seconds; video usually takes one to several minutes.
+4. When it succeeds, give the user the link from `get_video_link`. If it fails, report the error code; failed
+   generations are not charged, and a `retryable` error can simply be tried again.
 
-Work out the cost (price x seconds x count), **tell the person the price and get a yes before you spend
-anything**, and pass `max_cost_usd` so a job can never cost more than they agreed to.
+`buy_credits` charges the card the user saved at revana.si. Only call it when the user explicitly asks to buy a
+specific amount of credits, and confirm the amount first.
 
-## Generate
+## Other models
 
-```bash
-RESP=$(curl -s https://api.revana.si/v1/generations \
-  -H "Authorization: Bearer $REVANA_API_KEY" -H "Content-Type: application/json" \
-  -H "Idempotency-Key: $(uuidgen)" \
-  -d '{"model": "seedance-2.0", "input": {"prompt": "...", "resolution": "720p", "duration": 5, "aspect_ratio": "16:9", "audio": true}, "max_cost_usd": 1}')
-ID=$(echo "$RESP" | jq -r .id)
-```
-
-- `input` takes `prompt`, `resolution`, `aspect_ratio`, `duration`, `audio`, `seed`, `negative_prompt`, and media:
-  `image_url` (start frame or picture to edit), `end_image_url`, `image_urls` (references), `video_url`,
-  `audio_url`. Only values the model lists are accepted; anything else answers `422 invalid_input`, free.
-- Media must be public https links. For a local file: `POST /v1/uploads` with
-  `{"content_type": "image/png", "bytes": <size>}`, PUT the bytes to `upload_url` with `upload_headers`,
-  then use the returned `url`.
-
-## Wait and download
-
-```bash
-curl -s https://api.revana.si/v1/generations/$ID -H "Authorization: Bearer $REVANA_API_KEY" | jq '{status, cost_usd, error}'
-curl -sL https://api.revana.si/v1/generations/$ID/content -H "Authorization: Bearer $REVANA_API_KEY" -o out.mp4
-```
-
-Poll every few seconds until `status` is `succeeded` or `failed` (video can take several minutes). A picture
-model can return several files: `output.urls` lists them, the second is `/content/2`. On `failed`, read
-`error.code`: `retryable: true` means the same request may work later; otherwise change the request.
-`402 insufficient_credits` means the balance is too low: `GET /v1/balance` shows it, top up at
-https://revana.si/dashboard.
-
-Full reference: https://revana.si/llms.txt (everything in one file: https://revana.si/llms-full.txt).
+Revana's REST API also serves Veo 3.1, Kling, Wan, Nano Banana Pro, GPT Image, Suno and 200+ other image, video
+and music models. For those, point developers to https://revana.si/docs (full reference for agents:
+https://revana.si/llms.txt). Model pages with prices: `https://revana.si/models/<id>`.

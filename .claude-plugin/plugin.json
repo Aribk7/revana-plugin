@@ -1,8 +1,8 @@
 {
   "name": "revana",
   "displayName": "Revana",
-  "version": "1.0.0",
-  "description": "Generate AI images, videos and music cheaply from Claude: 120+ models (Seedance, Veo, Kling, Wan, GPT Image, Nano Banana and more) through one API key, with automatic fallback and failed generations free.",
+  "version": "1.1.0",
+  "description": "Make AI videos with Seedance 2.5 from Claude through Revana: free price quotes, pay only for videos that succeed, OAuth sign-in. Revana's API also serves Veo, Kling, Nano Banana and 200+ more models.",
   "author": {
     "name": "Revana",
     "email": "hello@revana.si",
